@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, StatusBar, ScrollView } from 'react-native';
 import moment from 'moment';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 import { PostAPI } from './api/post';
 
@@ -24,6 +25,7 @@ export default class App extends Component {
       errorMsg: '',
       posts: [],
       disableAll: false,
+      screenStatus: 'PORTRAIT'
     }
   }
 
@@ -89,6 +91,16 @@ export default class App extends Component {
     return localDate;
   }
 
+  async rotate() {
+    if (this.state.screenStatus == 'PORTRAIT') {
+      this.setState({ screenStatus: 'LANDSCAPE' })
+      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT);
+    } else {
+      this.setState({ screenStatus: 'PORTRAIT' })
+      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    }
+  }
+
   render() {
     return (
       <PubNubProvider client={pubnub}>
@@ -123,6 +135,12 @@ export default class App extends Component {
               <TouchableOpacity disabled={this.state.disableAll} onPress={() => this.submitPost()}>
                 <View style={styles.btn}>
                   <Text style={styles.btnTxt}>Post</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => this.rotate()}>
+                <View style={styles.btn}>
+                  <Text style={styles.btnTxt}>Rotate Screen</Text>
                 </View>
               </TouchableOpacity>
             </View>
